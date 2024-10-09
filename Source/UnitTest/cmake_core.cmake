@@ -59,6 +59,7 @@ target_compile_options(${ASTCENC_TEST}
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-c++98-compat-pedantic>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-c++98-c++11-compat-pedantic>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-float-equal>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-overriding-option>
 
         # Ignore things that the googletest build triggers
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-unknown-warning-option>
@@ -102,6 +103,21 @@ elseif(${ASTCENC_ISA_SIMD} MATCHES "sve_256")
     target_compile_options(${ASTCENC_TEST}
         PRIVATE
             -march=armv8-a+sve -msve-vector-bits=256)
+
+elseif(${ASTCENC_ISA_SIMD} MATCHES "sve_128")
+    target_compile_definitions(${ASTCENC_TEST}
+        PRIVATE
+            ASTCENC_NEON=1
+            ASTCENC_SVE=4
+            ASTCENC_SSE=0
+            ASTCENC_AVX=0
+            ASTCENC_POPCNT=0
+            ASTCENC_F16C=0)
+
+    # Enable SVE
+    target_compile_options(${ASTCENC_TEST}
+        PRIVATE
+            -march=armv8-a+sve)
 
 elseif(${ASTCENC_ISA_SIMD} MATCHES "sse2")
     target_compile_definitions(${ASTCENC_TEST}
